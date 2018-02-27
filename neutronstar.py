@@ -5,7 +5,7 @@ global G
 global MSOLAR
 G=197.327*6.67259*(10**-45)
 MSOLAR=1.1157467*(10**60)
-rhoS=[(3.7*10**17)*1.6*10/(9*10**16)]
+rhoS=[(32.7*10**17)*1.6*10/(9*10**16)]
 
 def initConstants(rhoS):
     rZero=[]
