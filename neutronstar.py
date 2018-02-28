@@ -42,18 +42,21 @@ def PressureToDensity(Pressure):
     density = 236*n**2.54 +n*MNEUTRON
     return density
 
+def intialPressure(rhoS):
+#how do we intialise pressure boio? 
+    
 # deriv equations for rk4
     
-#PLEASE IGNORE BELOW ITS ALL TO GET AN IDEA, its coding crime.
+#PLEASE IGNORE/CHANGE BELOW ITS ALL TO GET AN IDEA, its coding crime.
     
 def Pderiv(mHat,rHat,densityHat):
     return (-mHat*densityHat/(rHat**2))
-
+#do these need to be functions of can we just put the calcuations into the rk4 arguments? desnityhat is the same as rho hat, that is the same as the dimensionless energry density.
 def mderiv(rHat,densityHat):
     return ((rHat**2)*densityHat)
     
-#rk4 to give new mass and then pressure. ( each new pressure )
-    
+#rk4 to give new mass and then pressure.
+#rk4 takes y, the diferential and the x value, and aproximates the next point according the the diferential equation, it will spit out y1 and x1 from y0 and x0. 
 def rk4(y,dy,x,h):
     k1=dy(y,x)
     k2=dy(y+h/2*k1,x+h/2)
@@ -65,12 +68,15 @@ def rk4(y,dy,x,h):
 
 h = 1
 
-for i in range(0,1000):#because i want to see th result firstas we dont know what limit we are looking for 
-    (r,m)=rk4(0,mderiv,0,h)#ive gone blank
-    rHat[0[i]].append(r)
+for i in range(0,1000):#because i want to see th result first as we dont know what limit we are looking for 
+    (r,m)=rk4(0,mderiv,0,h)#use rk4 for dm/dr, got get m at the next r
+    rHat[0[i]].append(r) #append values found for one step, not sure if we need this. but we need to be able to distingush between the diferent rs and ms.
     mHat[0[i]].append(m)
-    (p,r)=rk4()
-    #i wnt to use the resultant m here with the original r? in the nex 
+    (r,p)=rk4() # then rk4 for dP/dr m found previous with  to give us pressure at the next r? 
+    #do we use the new m with the orginal r? it would not make sense to use the new m and the r it gave us because then we would be taking 2 steps in r for one in pressure.
+   #then use pressure to density function to find the new density at the new r.
+    #then repeat steps printing P at each step so we can see what happens.
+
 
 
 
