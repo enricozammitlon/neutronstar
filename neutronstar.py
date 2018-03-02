@@ -11,23 +11,13 @@ rhoS=[((3.7*10**17)*10**(-45)*(3*10**8)**2)/(1.6*10**(-13))] #MeVFm-3 - Energy d
 rHat = [[0]]
 rhoHat = [[1]]
 mHat = [[0]]
-pHat = [[6]]
-m=[[4]]
-r=[[5]]
-p=[[3]]
+pHat = []
+m=[[0]]
+r=[[0]]
+p=[]
 rZero=[]
 mZero=[]
-rho=[[5]]
-
-def initConstants(rhoS):
-    check=[]
-    for rhos in rhoS:
-        rZero.append([(10**-19)*(1/(np.sqrt(rhos*G*4*np.pi)))]) #with conversion factor for 10km
-        mZero.append([(4*np.pi*rhos)/(((rhos*G*4*np.pi)**(3/2))*MSOLAR)])#with convertion to terms of solar masses.
-        check.append((G*4*np.pi*rhos)/(((rhos*G*4*np.pi)**(3/2)))/(1/(np.sqrt(rhos*G*4*np.pi)))) #check according to chapter should be 1.
-    return rZero,mZero,check
-
-print(initConstants(rhoS))
+rho=[]
 
 def PressureToDensity(Pressure):
     #P = 363.44 * n**2.54
@@ -39,13 +29,14 @@ def CentralPressure(rho):#this matches the units required
     PressureCentral= ((HBARC*(pow(3*np.pi,2)*pow(rho,(5/3))))/(5*MNEUTRON)**(8/3))
     return PressureCentral
 
-print(CentralPressure(rhoS[0]))
-
 
 # deriv equations for rk4
 
 def Pderiv(mHat,rHat,densityHat):
-    return (-mHat*densityHat/(rHat**2))
+    if(rHat==0.):
+        return 0
+    else:
+        return (-mHat*densityHat/(rHat**2))
 
 def mderiv(m,rHat,densityHat):
     return ((rHat**2)*densityHat)
@@ -61,11 +52,25 @@ def rk4(y,dy,x,h,rhos):
     x=x+h
     return (x,y)
 
+def initConstants(rhoS):
+    check=[]
+    for rhos in rhoS:
+        rZero.append((10**-19)*(1/(np.sqrt(rhos*G*4*np.pi)))) #with conversion factor for 10km
+        mZero.append((4*np.pi*rhos)/(((rhos*G*4*np.pi)**(3/2))*MSOLAR))#with convertion to terms of solar masses.
+        check.append((G*4*np.pi*rhos)/(((rhos*G*4*np.pi)**(3/2)))/(1/(np.sqrt(rhos*G*4*np.pi)))) #check according to chapter should be 1.
+        p.append([CentralPressure(rhos)])
+        pHat.append([CentralPressure(rhos)/rhos])
+        rho.append([rhos])
+    return rZero,mZero,check
+
+print(initConstants(rhoS))
+
 h=0.01
 for j in range(0,len(rhoS)):
-    for i in range(2,5):
-        rHat[j].append(r[j][i-1]/rZero[j][i-1])
-        mHat[j].append(m[j][i-1]/mZero[j][i-1])
+    print("FOR DENSITY CENTRAL %f"%rhoS[j])
+    for i in range(1,5):
+        rHat[j].append(r[j][i-1]/rZero[j])
+        mHat[j].append(m[j][i-1]/mZero[j])
         rhoHat[j].append(rho[j][i-1]/rhoS[j])
         pHat[j].append(p[j][i-1]/rhoS[j])
         print("Mass:    \t%2.6e"%(mHat[j][i-1]))
