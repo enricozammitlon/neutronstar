@@ -78,18 +78,3 @@ for j in range(0,len(rhoS)):
         if(Pi<=0):
             break
         rhoHat[j].append(PressureToDensity(Pi))
-
-
-"""
-h = 1
-
-for i in range(0,1000):#because i want to see th result first as we dont know wHat limit we are looking for
-    (r,m)=rk4(0,mderiv,0,h)#use rk4 for dm/dr, got get m at the next r
-    rHat[0[i]].append(r) #append values found for one step, not sure if we need this. but we need to be able to distingush between the diferent rs and ms.
-    mHat[0[i]].append(m)
-    rhoHat.append([rho/rhoS])#?
-    (r,p)=rk4() # then rk4 for dP/dr m found previous with  to give us pressure at the next r?
-    #do we use the new m with the orginal r? it would not make sense to use the new m and the r it gave us because then we would be taking 2 steps in r for one in pressure.
-   #then use pressure to density function to find the new density at the new r.
-    #then repeat steps printing P at each step so we can see wHat happens.
-"""
