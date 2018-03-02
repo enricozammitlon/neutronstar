@@ -24,7 +24,7 @@ def PressureToDensity(Pressure):
 def CentralPressure(rho):#this matches the units required
     PressureCentral= ((HBARC**2)*(3*pow(np.pi,2))**(2/3)*pow(rho,(5/3)))/(5*(MNEUTRON)**(8/3))
     return PressureCentral
-
+print(CentralPressure(rhoS[0]))
 # deriv equations for rk4
 
 def Pderiv(phat,rhat,densityHat,mhat):
@@ -58,7 +58,7 @@ def initConstants(rhoS):
 
 print(initConstants(rhoS))
 
-h=0.000001
+h=0.00001
 for j in range(0,len(rhoS)):
     print("FOR DENSITY CENTRAL %f"%(rhoHat[j][0]))
     for i in range(1,5):
