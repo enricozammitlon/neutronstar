@@ -32,22 +32,22 @@ def CentralPressure(rho):#this matches the units required
 
 # deriv equations for rk4
 
-def Pderiv(mHat,rHat,densityHat):
-    if(rHat==0.):
+def Pderiv(phat,rhat,densityHat,mhat):
+    if(rhat==0.):
         return 0
     else:
-        return (-mHat*densityHat/(rHat**2))
+        return (-mhat*densityHat/(rhat**2))
 
-def mderiv(mHat,rHat,densityHat):
+def mderiv(mHat,rHat,densityHat,b):
     return ((rHat**2)*densityHat)
 
 #rk4 to give new mass and then pressure.
 #rk4 takes y, the diferential and the x value, and aproximates the next point according the the diferential equation, it will spit out y1 and x1 from y0 and x0.
-def rk4(y,dy,x,h,rhos):
-    k1=dy(y,x,rhos)
-    k2=dy(y+h/2*k1,x+h/2,rhos)
-    k3=dy(y+h/2*k2,x+h/2,rhos)
-    k4=dy(y+h*k3,x+h,rhos)
+def rk4(y,dy,x,h,rhos,mHat):
+    k1=dy(y,x,rhos,mHat)
+    k2=dy(y+h/2*k1,x+h/2,rhos,mHat)
+    k3=dy(y+h/2*k2,x+h/2,rhos,mHat)
+    k4=dy(y+h*k3,x+h,rhos,mHat)
     y=y+h*(k1+2*k2+2*k3+k4)/6
     x=x+h
     return (x,y)
@@ -58,30 +58,27 @@ def initConstants(rhoS):
         rZero.append((10**-19)*(1/(np.sqrt(rhos*G*4*np.pi)))) #with conversion factor for 10km
         mZero.append((4*np.pi*rhos)/(((rhos*G*4*np.pi)**(3/2))*MSOLAR))#with convertion to terms of solar masses.
         check.append((G*4*np.pi*rhos)/(((rhos*G*4*np.pi)**(3/2)))/(1/(np.sqrt(rhos*G*4*np.pi)))) #check according to chapter should be 1.
-        p.append([CentralPressure(rhos)])
         pHat.append([CentralPressure(rhos)/rhos])
-        rho.append([rhos])
     return rZero,mZero,check
 
 print(initConstants(rhoS))
 
-h=0.01
+h=0.000001
 for j in range(0,len(rhoS)):
-    print("FOR DENSITY CENTRAL %f"%rhoS[j])
-    for i in range(1,50):
-        rHat[j].append(r[j][i-1]/rZero[j])
-        mHat[j].append(m[j][i-1]/mZero[j])
-        rhoHat[j].append(rho[j][i-1]/rhoS[j])
-        pHat[j].append(p[j][i-1]/rhoS[j])
-        print("Mass:    \t%2.6e"%(mHat[j][i-1]))
-        (ri,mi)=rk4(mHat[j][i], mderiv , rHat[j][i], h, rhoHat[j][i])
-        r[j].append(ri)
-        m[j].append(mi)
-        (ri,Pi)=rk4(mHat[j][i-1], Pderiv , rHat[j][i-1],h, rhoHat[j][i-1])
-        p[j].append(Pi)
-        rho[j].append(PressureToDensity(Pi))
-        print("New Density:\t%f"%(PressureToDensity(Pi)))
-        print("Pressure:\t%2.6e"%Pi)
+    print("FOR DENSITY CENTRAL %f"%(rhoHat[j][0]))
+    for i in range(1,5):
+        print("Mass:    \t%2.6e"%(mHat[j][i-1]/mZero[j]))
+        print("Pressure:\t%2.6e"%(pHat[j][i-1]))
+        print("New Density:\t%f"%(PressureToDensity(pHat[j][i-1])))
+        (ri,mi)=rk4(mHat[j][i-1], mderiv , rHat[j][i-1], h, rhoHat[j][i-1],mHat[j][i-1])
+        rHat[j].append(ri)
+        mHat[j].append(mi)
+        (ri,Pi)=rk4(pHat[j][i-1], Pderiv , rHat[j][i-1], h , rhoHat[j][i-1],mHat[j][i-1])
+        pHat[j].append(Pi)
+        if(Pi<=0):
+            break
+        rhoHat[j].append(PressureToDensity(Pi))
+
 
 """
 h = 1
