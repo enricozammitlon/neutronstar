@@ -22,7 +22,7 @@ rho=[]
 def PressureToDensity(Pressure):
     #P = 363.44 * n**2.54
     n = (Pressure/363.44)**(1/2.54)
-    density = 236*n**2.54 +n*MNEUTRON
+    density = 236*(n**2.54) +n*MNEUTRON
     return density
 
 def CentralPressure(rho):#this matches the units required
@@ -38,7 +38,7 @@ def Pderiv(mHat,rHat,densityHat):
     else:
         return (-mHat*densityHat/(rHat**2))
 
-def mderiv(m,rHat,densityHat):
+def mderiv(mHat,rHat,densityHat):
     return ((rHat**2)*densityHat)
 
 #rk4 to give new mass and then pressure.
@@ -68,18 +68,19 @@ print(initConstants(rhoS))
 h=0.01
 for j in range(0,len(rhoS)):
     print("FOR DENSITY CENTRAL %f"%rhoS[j])
-    for i in range(1,5):
+    for i in range(1,50):
         rHat[j].append(r[j][i-1]/rZero[j])
         mHat[j].append(m[j][i-1]/mZero[j])
         rhoHat[j].append(rho[j][i-1]/rhoS[j])
         pHat[j].append(p[j][i-1]/rhoS[j])
         print("Mass:    \t%2.6e"%(mHat[j][i-1]))
-        (ri,mi)=rk4(mHat[j][i-1], mderiv , rHat[j][i-1], h, rhoHat[j][i-1])
+        (ri,mi)=rk4(mHat[j][i], mderiv , rHat[j][i], h, rhoHat[j][i])
         r[j].append(ri)
         m[j].append(mi)
-        (ri,Pi)=rk4(pHat[j][i-1], Pderiv , rHat[j][i-1],h, rhoHat[j][i-1])
+        (ri,Pi)=rk4(mHat[j][i-1], Pderiv , rHat[j][i-1],h, rhoHat[j][i-1])
         p[j].append(Pi)
         rho[j].append(PressureToDensity(Pi))
+        print("New Density:\t%f"%(PressureToDensity(Pi)))
         print("Pressure:\t%2.6e"%Pi)
 
 """
