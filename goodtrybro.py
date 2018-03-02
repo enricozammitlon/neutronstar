@@ -30,17 +30,17 @@ def mderiv(m,rHat,densityHat):
 
 
 
-h=0.1
+h=0.01
 
 for i in range(1,50):
-    print("Mass%6.2e : "%(m[i-1]))
+    print("Mass:    \t%2.6e"%(m[i-1]))
     (ri,mi)=rk4(m[i-1], mderiv , r[i-1], h, rho[i-1])
     r.append(ri)
     m.append(mi)
     (ri,Pi)=rk4(P[i-1], Pderiv , r[i-1],h,rho[i-1])
     P.append(Pi)
     rho.append(PressureToDensity(Pi))
-    print("Pressure%6.2e :"%Pi)
+    print("Pressure:\t%2.6e"%Pi)
 
 
 
