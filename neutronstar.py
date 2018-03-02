@@ -12,12 +12,8 @@ rHat = [[0]]
 rhoHat = [[1]]
 mHat = [[0]]
 pHat = []
-m=[[0]]
-r=[[0]]
-p=[]
 rZero=[]
 mZero=[]
-rho=[]
 
 def PressureToDensity(Pressure):
     #P = 363.44 * n**2.54
@@ -26,9 +22,8 @@ def PressureToDensity(Pressure):
     return density
 
 def CentralPressure(rho):#this matches the units required
-    PressureCentral= ((HBARC*(pow(3*np.pi,2)*pow(rho,(5/3))))/(5*MNEUTRON)**(8/3))
+    PressureCentral= ((HBARC**2)*(3*pow(np.pi,2))**(2/3)*pow(rho,(5/3)))/(5*(MNEUTRON)**(8/3))
     return PressureCentral
-
 
 # deriv equations for rk4
 
