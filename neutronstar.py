@@ -4,6 +4,7 @@ c=299792458 # m/s
 G=197.327*6.67259*(10**-45) # not checked
 MSOLAR=1.1157467*(10**60) #Mev - Energy
 MNEUTRON = 938.926 # Mev
+HBARC = 197.327 # MevFm
 
 rhoS=[((3.7*10**17)*10**(-45)*(3*10**8)**2)/(1.6*10**(-13))] #MeVFm-3 - Energy desnity from Kgm-3
 #do we want rhos in kg and then another array where rhos are in energy density using this converstion?
@@ -34,24 +35,14 @@ def PressureToDensity(Pressure):
     density = 236*n**2.54 +n*MNEUTRON
     return density
 
-#Im not sure these should return relatible numbers, but the units seem to check out. Mass is in terms of energy and density is energy density.
+def CentralPressure(rho):#this matches the units required
+    PressureCentral= ((HBARC*(pow(3*np.pi,2)*pow(rho,(5/3))))/(5*MNEUTRON)**(8/3))
+    return PressureCentral
 
-#solve equations
+print(CentralPressure(rhoS[0]))
 
-#function for New pressure to new density
-
-def PressureToDensity(Pressure):
-    #P = 363.44 * n**2.54
-    n = (Pressure/363.44)**(1/2.54)
-    density = 236*n**2.54 +n*MNEUTRON
-    return density
-
-#def intialPressure(rhoS):
-#how do we intialise pressure boio?
 
 # deriv equations for rk4
-
-#PLEASE IGNORE/CHANGE BELOW ITS ALL TO GET AN IDEA, its coding crime.
 
 def Pderiv(mHat,rHat,densityHat):
     return (-mHat*densityHat/(rHat**2))
@@ -81,7 +72,7 @@ for j in range(0,len(rhoS)):
         (ri,mi)=rk4(mHat[j][i-1], mderiv , rHat[j][i-1], h, rhoHat[j][i-1])
         r[j].append(ri)
         m[j].append(mi)
-        (ri,Pi)=rk4(pHat[j][i-1], Pderiv , rHat[j][i-1],h,rhoHat[j][i-1])
+        (ri,Pi)=rk4(pHat[j][i-1], Pderiv , rHat[j][i-1],h, rhoHat[j][i-1])
         p[j].append(Pi)
         rho[j].append(PressureToDensity(Pi))
         print("Pressure:\t%2.6e"%Pi)
