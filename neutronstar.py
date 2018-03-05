@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 c=299792458 # m/s
 G=197.327*6.67259*(10**-45) # not checked
@@ -7,6 +9,7 @@ MNEUTRON = 938.926 # Mev
 HBARC = 197.327 # MevFm
 
 rhoS=[((3.7*10**17)*10**(-45)*(3*10**8)**2)/(1.6*10**(-13))] #MeVFm-3 - Energy desnity from Kgm-3
+#rhoS=[10000]
 #do we want rhos in kg and then another array where rhos are in energy density using this converstion?
 rHat = [[0]]
 rhoHat = [[1]]
@@ -58,7 +61,7 @@ def initConstants(rhoS):
 
 print(initConstants(rhoS))
 
-h=0.00001
+h=0.0001
 for j in range(0,len(rhoS)):
     print("FOR DENSITY CENTRAL %f"%(rhoHat[j][0]))
     for i in range(1,5):
@@ -73,3 +76,14 @@ for j in range(0,len(rhoS)):
         if(Pi<=0):
             break
         rhoHat[j].append(PressureToDensity(Pi))
+
+fig = plt.figure()
+x=rHat[0]
+y1=mHat[0]
+y2=pHat[0]
+y=np.sin(x)
+plt.plot(x,y1)
+
+fig2=plt.figure()
+plt.plot(x,y2)
+plt.show()
