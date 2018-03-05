@@ -1,4 +1,6 @@
 import numpy as np
+from scipy import optimize
+import matplotlib.pyplot as plt
 
 c=299792458 # m/s
 G=197.327*6.67259*(10**-45) # not checked
@@ -15,16 +17,28 @@ pHat = []
 rZero=[]
 mZero=[]
 
+def f(n):
+    return (rhoS[0] - 236*n**(2.54) - n*MNEUTRON)
+
+root = optimize.newton(f,50)
+
+print(root/rhoS[0])
+
 def PressureToDensity(Pressure):
     #P = 363.44 * n**2.54
     n = (Pressure/363.44)**(1/2.54)
     density = 236*(n**2.54) +n*MNEUTRON
     return density
 
+def DensityToPressure(n):
+    P = 363.44 * n**2.54
+    return P
+
 def CentralPressure(rho):#this matches the units required
-    PressureCentral= ((HBARC**2)*(3*pow(np.pi,2))**(2/3)*pow(rho,(5/3)))/(5*(MNEUTRON)**(8/3))
+    PressureCentral= ((HBARC**2)*(3*pow(np.pi,2))**(2/3)*pow(rho,(5/3))*pow(rhoS[0],2/3))/(5*(MNEUTRON)**(8/3)) #changed
     return PressureCentral
 print(CentralPressure(rhoS[0]))
+print(rhoS[0])
 # deriv equations for rk4
 
 def Pderiv(phat,rhat,densityHat,mhat):
@@ -53,15 +67,15 @@ def initConstants(rhoS):
         rZero.append((10**-19)*(1/(np.sqrt(rhos*G*4*np.pi)))) #with conversion factor for 10km
         mZero.append((4*np.pi*rhos)/(((rhos*G*4*np.pi)**(3/2))*MSOLAR))#with convertion to terms of solar masses.
         check.append((G*4*np.pi*rhos)/(((rhos*G*4*np.pi)**(3/2)))/(1/(np.sqrt(rhos*G*4*np.pi)))) #check according to chapter should be 1.
-        pHat.append([CentralPressure(rhos)/rhos])
+        pHat.append([DensityToPressure(root/rhoS[0])])
     return rZero,mZero,check
 
 print(initConstants(rhoS))
 
-h=0.00001
+h=0.000001
 for j in range(0,len(rhoS)):
     print("FOR DENSITY CENTRAL %f"%(rhoHat[j][0]))
-    for i in range(1,5):
+    for i in range(1,5000):
         print("Mass:    \t%2.6e"%(mHat[j][i-1]/mZero[j]))
         print("Pressure:\t%2.6e"%(pHat[j][i-1]))
         print("New Density:\t%f"%(PressureToDensity(pHat[j][i-1])))
@@ -73,3 +87,9 @@ for j in range(0,len(rhoS)):
         if(Pi<=0):
             break
         rhoHat[j].append(PressureToDensity(Pi))
+        print(mHat[j][i-1]*mZero[j])
+        
+fig1=plt.plot(rHat[j],mHat[j])
+fig2=plt.plot(rHat[j],pHat[j])
+plt.show()
+3
