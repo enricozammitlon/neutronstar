@@ -8,10 +8,10 @@ MSOLAR = 1.1157467*(10**60)#Mev - Energy
 MNEUTRON = 938.926 # Mev
 HBARC = 197.327 # MevFm
 
-rhoS=[((3.7*10**17)*10**(-45)*(3*10**8)**2)/(1.6*10**(-13))] #MeVFm-3 - Energy desnity from Kgm-3
+rhoS=[((3.7*10**17)*10**(-45))/(1.6*10**(-13))] #MeVFm-3 - Energy desnity from Kgm-3
 #do we want rhos in kg and then another array where rhos are in energy density using this converstion?
 h=0.000001
-rHat = [[0]]
+rHat = [[h]]
 rhoHat = [[1]]
 mHat = [[0]]
 pHat = []
@@ -21,14 +21,12 @@ mZero=[]
 def f(n):
     return (rhoS[0] - 236*n**(2.54) - n*MNEUTRON)
 root = optimize.newton(f,50)
-print(root/rhoS[0])
+print(root)
 
 def PressureToDensity(Pressure):
     #P = 363.44 * n**2.54
     n = (Pressure/363.44)**(1/2.54)
-    print ("this is n from p2d %6.20f" %n)
     density = 236*(n**2.54) +n*MNEUTRON
-    print ("this is density from p2d %6.20f" %density)
     return density
 
 def DensityToPressure(n):
@@ -68,10 +66,9 @@ def initConstants(rhoS):
 
 print(initConstants(rhoS))
 
-
 for j in range(0,len(rhoS)):
     print("FOR DENSITY CENTRAL %f"%(rhoHat[j][0]))
-    for i in range(1,5000000):
+    for i in range(1,4):
         print("Mass:    \t%2.6e"%(mHat[j][i-1]*mZero[j]))
         print("Pressure:\t%2.6e"%(pHat[j][i-1]))
         print("New Density:\t%f"%(rHat[j][i-1]*rZero[j]))
@@ -86,7 +83,7 @@ for j in range(0,len(rhoS)):
         rhoHat[j].append(PressureToDensity(Pi))
       
         
-"""
+
 fig = plt.figure()
 x=rHat[0]
 y1=mHat[0]
@@ -101,4 +98,3 @@ plt.plot(x,y2)
 plt.xlabel("radius meters")
 plt.ylabel("pressure Nm^-2")
 plt.show()
-"""
