@@ -21,6 +21,8 @@ mZero=[]
 """
 def f(n):
     return (rhoS[0] - 236*n**(2.54) - n*MNEUTRON)
+root = optimize.newton(f,50)
+print(root)
 
 root = optimize.newton(f,500)
 print(root/rhoS[0])
@@ -28,9 +30,7 @@ print(root/rhoS[0])
 def PressureToDensity(Pressure):
     #P = 363.44 * n**2.54
     n = (Pressure/363.44)**(1/2.54)
-    #print ("this is n from p2d %6.20f" %n)
     density = 236*(n**2.54) +n*MNEUTRON
-    #print ("this is density from p2d %6.20f" %density)
     return density
 
 def DensityToPressure(rho):
@@ -77,7 +77,6 @@ def initConstants(rhoS):
     return rZero,mZero,check
 
 print(initConstants(rhoS))
-
 
 for j in range(0,len(rhoS)):
     #print("FOR DENSITY CENTRAL %f"%(rhoS[j]))
