@@ -6,11 +6,12 @@ h=0.0001
 
 c=299792458 # m/s
 G=(197.327*6.67259*(10**-45)) # not checked
+#G=6.67e-11
 MSOLAR = 1.1157467*(10**60)#Mev - Energy
 MNEUTRON = 938.926 # Mev
 HBARC = 197.327 # MevFm
 #HBARC=6.58e-7
-rhoS=np.arange(196,2000,1) #MeVFm-3 - Energy desnity from Kgm-3
+rhoS=np.arange(196,250,1) #MeVFm-3 - Energy desnity from Kgm-3
 #do we want rhos in kg and then another array where rhos are in energy density using this converstion?
 rHat = [[h] for i in range(len(rhoS)) ]
 rhoHat = [[1] for i in range(len(rhoS))]
@@ -34,7 +35,7 @@ def PressureToDensity(Pressure):
     return density
 
 def DensityToPressure(rho):
-    n=optimize.newton(lambda x: rho-236*(x**(2.54))-x*MNEUTRON,50)
+    n=optimize.newton(lambda x: rho-236*(x**(2.54))-x*MNEUTRON,5)
     P = 363.44 * (n**2.54)
     print ("this is p from d2p %6.20f" %P)
     return P
@@ -54,7 +55,7 @@ def Pderiv(phat,rHat,densityHat,mHat):
         return (-mHat*densityHat)/pow(rHat,2)
 
 def mderiv(mHat,rHat,densityHat,b):
-    return ((rHat**2)*densityHat)
+    return (pow(rHat,2)*densityHat)
 
 #rk4 to give new mass and then pressure.
 #rk4 takes y, the diferential and the x value, and aproximates the next point according the the diferential equation, it will spit out y1 and x1 from y0 and x0.
@@ -105,9 +106,9 @@ plt.scatter(x,y1)
 
 
 fig2 = plt.figure()
-y2=[pHat[i][0]*rhoS[i] for i in range(len(pHat))]
+y2=[rhoHat[i][0]*rhoS[i] for i in range(len(pHat))]
 plt.xlabel("radius / 10 km")
-plt.ylabel("pressure")
+plt.ylabel("density")
 plt.scatter(x,y2)
 
 plt.show()
