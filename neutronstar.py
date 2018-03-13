@@ -44,6 +44,7 @@ def DensityToPressure(rho):
     #print ("this is p from d2p %6.20f" %P)
     return P
 
+'''
 def PressureToDensity1(P):
     n=pow((P*5*MNEUTRON)/(pow(3,2/3)*pow(np.pi,4/3)*pow(HBARC,2)),3/5)
     rho=(pow(HBARC,2)*pow(3*pow(np.pi,2)*n,5/3))/(10*pow(np.pi,2)*MNEUTRON)+n*MNEUTRON
@@ -54,13 +55,20 @@ def DensityToPressure1(rho):
     P = (pow(HBARC,2)*pow(n,5/3)*pow(3,2/3)*pow(np.pi,4/3))/(5*MNEUTRON)
     #print ("this is p from d2p %6.20f" %P)
     return P
-
-def Pderiv(phat,rHat,densityHat,mHat):
+'''
+def xderiv(phat,rHat,densityHat,mHat):
     if(rHat==0.):
         #print("HEYOOO")
         return 0.
     else:
         return (-mHat*densityHat)/pow(rHat,2)
+    #relderive
+def Pderiv(pHat,rHat,densityHat,mHat):
+    if(rHat==0.):
+        return 0
+    else:
+        return(((pHat+densityHat)*(pow(rHat,3)*pHat+mHat))/(pow(rHat,2)-2*mHat*rHat))
+
 
 def mderiv(mHat,rHat,densityHat,b):
     return (pow(rHat,2)*densityHat)

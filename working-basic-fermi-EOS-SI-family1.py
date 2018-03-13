@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Mar  9 17:04:08 2018
+
+@author: cdsch
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 c=299792458
@@ -8,10 +14,10 @@ MNEUTRON = 1.67*10**(-27)
 MSolarFinal =[]
 RFinal =[]
 
-family = np.arange((3.7), (3.7*10**2),20)
+family = np.arange((20), (2*10**3),50)
 for rhoIn in family:
 
-    h = 100.0
+    h = 10.0
     r =[h]
     m =[0]
     MSOL = [0]
@@ -43,24 +49,30 @@ for rhoIn in family:
     def DensityToPressure2(rho):
         P=(hbar*c*pow(MNEUTRON,(-4/3))*pow(3*pow(np.pi,2),(1/3))*pow(rho,(4/3))/3)
         return P
-    '''
-    print(DensityToPressure1(rho[0]))
-    print(PressureToDensity1(DensityToPressure1(rho[0])))
-    
-    print(DensityToPressure2(rho[0]))
-    print(PressureToDensity2(DensityToPressure2(rho[0])))
-    '''
-    def Pderiv(P,r,rho,m):
-        
-        return (-G*m*rho/pow(r,2))
+  
+    def Pderiv(p,r,density,m):
+        if(r==0):
+            return 0
+        else:
+            return ((-G*m*density)/pow(r,2))
+
+    def Xderiv(P,r,rho,m): # working relivitistic 
+        if m == 0:
+            return 0
+        else:
+            a = (1+(P/(rho*pow(c,2))))*(1+(4*np.pi*pow(r,3)*P)/(m*pow(c,2)))*pow((1-(2*G*m/(r*pow(c,2)))),-1)
+            b = (-G*m*rho/pow(r,2))
+            d=a*b
+            return d
     
     def Mderiv(M,r,rho,b):
         return (4*rho*np.pi*pow(r,2))
     
     P.append(DensityToPressure2(rho[0]))
     #P.append(500)
-    for i in range(1,10000000):
-        if i < 5:
+    for i in range(1,100000):
+        #if rho[i-1] >  3.8*10*17:
+        if rho[i-1] > 2e17:
             print("Mass:    \t%2.6e"%(m[i-1]))
             print("Pressure:\t%2.6e"%(P[i-1]))
             print("New Density:\t%e"%(rho[i-1]))
@@ -68,6 +80,8 @@ for rhoIn in family:
             (r1,m1)= rk4(m[i-1], Mderiv ,r[i-1],h,rho[i-1],1)
             (r1,P1) = rk4(P[i-1], Pderiv ,r[i-1],h,rho[i-1],m[i-1])
             if(P1<=0):
+                MSolarFinal.append((m[i-1]/(1.989*10**30)))
+                RFinal.append(r[i-1]/1000)
                 break
             P.append(P1)
             r.append(r1)
@@ -92,43 +106,29 @@ for rhoIn in family:
             rho.append(PressureToDensity1(P1))
         
     
-    '''   
-    fig = plt.figure()
-    x=r
-    y1=MSOL
-    y2=P
-    plt.xlabel("radius meters")
-    plt.ylabel("SOLAR MASSES")
-    
-    plt.plot(x,y1)
-    
-    fig2=plt.figure()
-    plt.plot(x,y2)
-    plt.xlabel("radius meters")
-    plt.ylabel("pressure Nm^-2")
-    plt.show()
-    '''
+
 print (MSolarFinal, RFinal)
 
 fig = plt.figure()
 x1=RFinal
 y=MSolarFinal
+y2=RFinal
 x2=(family*10**15)
 plt.xlabel("radius KM")
 plt.ylabel("SOLAR MASSES")
+plt.plot(x1, y, "o")
 
-plt.plot(x1,y)
 
 fig2=plt.figure()
-plt.plot(x2,y)
-plt.xlabel("central density")
+plt.plot(x2, y, "o")
+plt.xlabel("central density kg/m^3")
 plt.ylabel("SOLAR MASSES")
 plt.show()
 
-    
-    
-    
-    
-    
-    
+fig3=plt.figure()
+plt.plot(x2, y2, "o")
+plt.xlabel("central desnisty kg/m^3")
+plt.ylabel("R")
+plt.show()
+
     
