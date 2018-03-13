@@ -2,16 +2,16 @@ import numpy as np
 from scipy import optimize
 import matplotlib.pyplot as plt
 
-h=0.0001
+h=10.0
 
 c=299792458 # m/s
 G=(197.327*6.67259*(10**-45)) # not checked
 #G=6.67e-11
-MSOLAR = 1.1157467*(10**60)#Mev - Energy
-MNEUTRON = 938.926 # Mev
+MSOLAR = 1.1157467*(10**60)/(pow(c,2))#Mev - Energy
+MNEUTRON = 938.926/(pow(c,2)) # Mev
 HBARC = 197.327 # MevFm
 #HBARC=6.58e-7
-rhoS=np.arange(196,250,1) #MeVFm-3 - Energy desnity from Kgm-3
+rhoS=np.arange(19600,25000,1) #MeVFm-3 - Energy desnity from Kgm-3
 #do we want rhos in kg and then another array where rhos are in energy density using this converstion?
 rHat = [[h] for i in range(len(rhoS)) ]
 rhoHat = [[1] for i in range(len(rhoS))]
@@ -35,11 +35,12 @@ def PressureToDensity(Pressure):
     return density
 
 def DensityToPressure(rho):
-    n=optimize.newton(lambda x: rho-236*(x**(2.54))-x*MNEUTRON,5)
+    n=optimize.newton(lambda x: rho-236*(x**(2.54))-x*MNEUTRON,50)
     P = 363.44 * (n**2.54)
     print ("this is p from d2p %6.20f" %P)
     return P
 
+'''
 def PressureToDensity1(P):
     rho = pow((3*P*pow(MNEUTRON,4/3)*pow(3*pow(np.pi,2),-1/3))/(HBARC),3/4)
     return rho
@@ -47,12 +48,19 @@ def PressureToDensity1(P):
 def DensityToPressure1(rho):
     P=(HBARC*pow(MNEUTRON,(-4/3))*pow(3*pow(np.pi,2),(1/3))*pow(rho,(4/3))/3)
     return P
-
-def Pderiv(phat,rHat,densityHat,mHat):
+'''
+def xderiv(phat,rHat,densityHat,mHat):
     if(rHat==0.):
         return 0
     else:
         return (-mHat*densityHat)/pow(rHat,2)
+    #relderive
+def Pderiv(pHat,rHat,densityHat,mHat):
+    if(rHat==0.):
+        return 0
+    else:
+        return(((pHat+densityHat)*(pow(rHat,3)*pHat+mHat))/(pow(rHat,2)-2*mHat*rHat))
+    
 
 def mderiv(mHat,rHat,densityHat,b):
     return (pow(rHat,2)*densityHat)
