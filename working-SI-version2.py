@@ -23,7 +23,7 @@ the second one. The same applies for the RFinal 2D array but holding radius.
 MSolarFinal =[[],[]]
 RFinal =[[],[]]
 #This is used to initialise the boundary for central densities
-family = np.arange(20, (2*10**3),50) #To be multipled x10^15
+family = np.arange(1, (9.9*10**3),50) #To be multipled x10^15
 #This dictionary serves to then label the graphs appropriately, make use of it!
 methodNames={0:'Other',1:'Bethe And Johnson'}
 #Our RK4 integration numerical method method
@@ -179,7 +179,7 @@ for i in range(methods):
     y2=RFinal[i]
     x2=(family*10**15)
     plt.plot(x2, y, "o",label=methodNames[i])
-    plt.xlabel("Central Density/ kgm-3")
+    plt.xlabel("Central Density/ kgm^-3")
     plt.ylabel("Solar Masses")
 plt.legend()
 #A graph of Radius vs Central Density for the whole family,for all methods
