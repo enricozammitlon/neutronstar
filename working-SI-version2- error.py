@@ -160,7 +160,7 @@ for currentmethod in range(methods): #For each method combination
       m =[[0],[0]] #Will hold the mass as it grows
       rho = [[(rhoIn*1e17)],[(rhoIn*1e17)]] #Will hold the density as it decreases
       P = [] #Will hold the pressure as it decreases
-      breakpoint=1e18 #For method 0 a breakpoint between high and low densities is needed
+      breakpoint=2.3e17 #For method 0 a breakpoint between high and low densities is needed
 
       mrk5 =[0]#further arrays for the rk5 comparitive method, if used.
       Prk5 = []
