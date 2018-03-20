@@ -23,7 +23,7 @@ the second one. The same applies for the RFinal 2D array but holding radius.
 MSolarFinal =[[],[]]
 RFinal =[[],[]]
 #This is used to initialise the boundary for central densities
-family = np.arange(1, (9.9*10**3),50) #To be multipled x10^15
+family = np.arange(1.69, (1.09*10**2),0.5) #To be multipled x10^15
 #This dictionary serves to then label the graphs appropriately, make use of it!
 methodNames={0:'Other',1:'Bethe And Johnson'}
 #Our RK4 integration numerical method method
@@ -118,9 +118,9 @@ for currentmethod in range(methods): #For each method combination
       h = 10.0 #Step size in meters
       r =[h] #Will hold the radius as it grows
       m =[0] #Will hold the mass as it grows
-      rho = [(rhoIn*10**15)] #Will hold the density as it decreases
+      rho = [(rhoIn*10**17)] #Will hold the density as it decreases
       P = [] #Will hold the pressure as it decreases
-      breakpoint=2e17 #For method 0 a breakpoint between high and low densities is needed
+      breakpoint=1e17 #For method 0 a breakpoint between high and low densities is needed
 
       #Initialise the pressure using the appropriate D2P(current_central_density)
       if currentmethod==0 :
