@@ -165,11 +165,6 @@ for currentmethod in range(methods): #For each method combination
       mrk5 =[0]#further arrays for the rk5 comparitive method, if used.
       Prk5 = []
 
-      r2 =[2*h] #Will hold the radius as it grows
-      m2 =[0] #Will hold the mass as it grows
-      rho2 = [(rhoIn*1e17)] #Will hold the density as it decreases
-      P2 = [] #Will hold the pressure as it decreases
-
       continueSecondStar=True
 
       #Initialise the pressure using the appropriate D2P(current_central_density)
@@ -181,11 +176,6 @@ for currentmethod in range(methods): #For each method combination
           P.append([DensityToPressure3(rho[1][0])])
 
       for i in range(1,100000): #Arbitrary number of iterations to ensure enough
-          #print("Mass:    \t%2.6e"%(m[i-1]))
-          #print("Pressure:\t%2.6e"%(P[i-1]))
-          #print("New Density:\t%e"%(rho[i-1]))
-          #print("New R :\t%f"%(r[i-1]))
-
           #Use the previous mass,radius and density to calculate the next one
           #(r1,m1)= rk4(m[i-1], Mderiv ,r[i-1],h,rho[i-1],1)
           if(continueSecondStar):
@@ -298,6 +288,7 @@ for i in range(methods):
     plt.ylabel("Solar Masses")
 plt.legend()
 #A graph of Radius vs Central Density for the whole family,for all methods
+
 fig3=plt.figure()
 for i in range(methods):
     x1=RFinal[i]
