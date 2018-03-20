@@ -2,7 +2,7 @@
 """
 Created on Fri Mar  9 17:04:08 2018
 
-@author: cdsch
+@authors: cdsch,enrico
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,21 +23,26 @@ the second one. The same applies for the RFinal 2D array but holding radius.
 MSolarFinal =[[],[]]
 RFinal =[[],[]]
 RFError =[[],[]]
+MFE =[[],[]]
+RFE =[[],[]]
 #This is used to initialise the boundary for central densities
-family = np.arange(1.69, (1.09*10**2),1) #To be multipled x10^17 using BJ resitrcitions 
+family = np.arange(1.69, (1.09*10**2),1) #To be multipled x10^17 using BJ resitrcitions
 #This dictionary serves to then label the graphs appropriately, make use of it!
 methodNames={0:'Ideal Neutron Degenerate Gas',1:'Bethe And Johnson'}
 #Our RK4 integration numerical method method
 def rk4(y,dy,x,h,rho,m):
-    k1=dy(y,x,rho,m)
-    k2=dy(y+h/2*k1,x+h/2,rho,m)
-    k3=dy(y+h/2*k2,x+h/2,rho,m)
-    k4=dy(y+h*k3,x+h,rho,m)
-    y=y+h*(k1+2*k2+2*k3+k4)/6
-    x=x+h
-    return (x,y)
+    results=[]
+    for i in range(len(y)):#This loops for all the values of h,2h...etc
+        k1=dy(y[i],x[i],rho[i],m[i])
+        k2=dy(y[i]+h[i]/2*k1,x[i]+h[i]/2,rho[i],m[i])
+        k3=dy(y[i]+h[i]/2*k2,x[i]+h[i]/2,rho[i],m[i])
+        k4=dy(y[i]+h[i]*k3,x[i]+h[i],rho[i],m[i])
+        yf=y[i]+h[i]*(k1+2*k2+2*k3+k4)/6
+        xf=x[i]+h[i]
+        results.append([xf,yf])
+    return results
 
-#our RK5 method for giving a comparitive againt the rk4's accuracy 
+#our RK5 method for giving a comparitive againt the rk4's accuracy
 #( the rk5 is theoretcally more accurate but, numerical errors are larger
 #this will be used in disucssion as to how good the rk4 is.
 def rk5(y,dy,x,h,rho,m):
@@ -50,12 +55,12 @@ def rk5(y,dy,x,h,rho,m):
     y=y+(7*k1+32*k3+12*k4+32*k5+7*k6)/90
     x=x+h
     return (x,y)
-    
+
 def Euler(y,dy,x,h,rho,m):
     y = y + h*dy(y,x,rho,m)
     x = x+h
     return (x,y)
-    
+
 
 #To be used when?
 def DensityToPressure1(rho):
@@ -98,7 +103,7 @@ def DensityToPressure3(rho):
 
 #This is the classical derivative for pressure.
 #!!!!Rename to Pderiv if you want to use this instead of the TOV!!!!
-omega = 2*np.pi*300
+omega = 2*np.pi*0
 #omega is used to investigate the addition of (special [not accelerating]) relavtatistic fictious forces
 #set omega to zero to ingore this for the main data set
 def Xderiv(p,r,density,m):
@@ -134,14 +139,14 @@ def Mderiv(M,r,rho,b):
 #Becomes 0
 def Extrap(p1,p2,m1,m2,r1,r2,h):
   grad1 = (p1-p2)/(r1-r2) #Take gradient of pressure
-  c = P1 - grad1*r1 #This is the linear form y=mx+c
+  c = p1 - grad1*r1 #This is the linear form y=mx+c
   #Use newton-raphson numerical analysis to get the radius at P=0
   RadExtrap =optimize.newton(lambda R: +grad1*R +c, r1)
   grad2 = (m1-m2)/(r1-r2) #Mass gradient
   d = m1 - grad2*r1 #Calculate offset of mass using y=mx+c again
   MassExtrap = grad2*RadExtrap + d #Extrapolate to where P=0 ( R(P=0))
   #error in extrapolations for linear is (x1-x2)^2! This will be combined with the rk4 trunkation error prportional to h^5
-  RadError = pow((r1-r2),2)
+  RadError = pow((r1/1000-r2/1000),2)
   return RadExtrap,MassExtrap,RadError
 
 #Number of combinations of P2D and D2P used. Recall (n+1) since 0 is included
@@ -150,28 +155,31 @@ methods=2
 for currentmethod in range(methods): #For each method combination
     for rhoIn in family: #For each central density
 
-      h = 10 #Step size in meters
-      r =[h] #Will hold the radius as it grows
-      m =[0] #Will hold the mass as it grows
-      rho = [(rhoIn*1e17)] #Will hold the density as it decreases
+      h = [10,20] #Step size in meters
+      r =[[h[0]],[h[1]]] #Will hold the radius as it grows
+      m =[[0],[0]] #Will hold the mass as it grows
+      rho = [[(rhoIn*1e17)],[(rhoIn*1e17)]] #Will hold the density as it decreases
       P = [] #Will hold the pressure as it decreases
       breakpoint=1e18 #For method 0 a breakpoint between high and low densities is needed
-      
+
       mrk5 =[0]#further arrays for the rk5 comparitive method, if used.
       Prk5 = []
-      
+
       r2 =[2*h] #Will hold the radius as it grows
       m2 =[0] #Will hold the mass as it grows
       rho2 = [(rhoIn*1e17)] #Will hold the density as it decreases
       P2 = [] #Will hold the pressure as it decreases
-      
+
+      continueSecondStar=True
 
       #Initialise the pressure using the appropriate D2P(current_central_density)
       if currentmethod==0 :
-          P.append(DensityToPressure2(rho[0]))
+          P.append([DensityToPressure2(rho[0][0])])
+          P.append([DensityToPressure2(rho[1][0])])
       if currentmethod==1:
-          P.append(DensityToPressure3(rho[0]))
-    
+          P.append([DensityToPressure3(rho[0][0])])
+          P.append([DensityToPressure3(rho[1][0])])
+
       for i in range(1,100000): #Arbitrary number of iterations to ensure enough
           #print("Mass:    \t%2.6e"%(m[i-1]))
           #print("Pressure:\t%2.6e"%(P[i-1]))
@@ -179,87 +187,89 @@ for currentmethod in range(methods): #For each method combination
           #print("New R :\t%f"%(r[i-1]))
 
           #Use the previous mass,radius and density to calculate the next one
-          (r1,m1)= rk4(m[i-1], Mderiv ,r[i-1],h,rho[i-1],1)
+          #(r1,m1)= rk4(m[i-1], Mderiv ,r[i-1],h,rho[i-1],1)
+          if(continueSecondStar):
+              mResults= rk4([m[0][i-1],m[1][i-1]], Mderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
+          else:
+              mResults= rk4([m[0][i-1],m[1][-1]], Mderiv ,[r[0][i-1],r[1][-1]],h,[rho[0][i-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
+          (r1,m1)=mResults[0]
+          (r2,m2)=mResults[1]
           #Use the previous mass,radius,density and pressure to calculate the next one
-          (r1,P1) = rk4(P[i-1], Pderiv ,r[i-1],h,rho[i-1],m[i-1])
-          
+          #(r1,P1) = rk4(P[i-1], Pderiv ,r[i-1],h,rho[i-1],m[i-1])
+          if(continueSecondStar):
+              pResults = rk4([P[0][i-1],P[1][i-1]], Pderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
+          else:
+              pResults = rk4([P[0][i-1],P[1][-1]], Pderiv ,[r[0][-1],r[1][-1]],h,[rho[0][-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
+          (r1,P1)=pResults[0]
+          (r2,P2)=pResults[1]
           ##### euler and rk5 for comparitive simulations at different 'accuracy''
           #(r1,m1)= Euler(m[i-1], Mderiv ,r[i-1],h,rho[i-1],1)
           #(r1,P1) = Euler(P[i-1], Pderiv ,r[i-1],h,rho[i-1],m[i-1])
           #(r1,m1)= rk5(m[i-1], Mderiv ,r[i-1],h,rho[i-1],1)
           #(r1,P1) = rk5(P[i-1], Pderiv ,r[i-1],h,rho[i-1],m[i-1])
-          
-          
+
+
           #rk5 method used for comparison
           #(a,P2) = rk5(P[i-1], Pderiv ,r[i-1],h,rho[i-1],m[i-1])
           #(a,m2) = rk5(m[i-1], Mderiv ,r[i-1],h,rho[i-1],1)
-          
-          
+
           if(P1<=0):#Boundary condition to know when to stop since edge is reached
               #interpolate the pressure and mass to where P=0
               #where RE is radius error due to interploation (newton)
-              (RF,MF,RE) = Extrap(P[i-1],P[i-2],m[i-1],m[i-2],r[i-1],r[i-2],h)
-              print("Final Mass: %f"%MF)
-              print("Final Radius: %f"%RF)
-              print("Final Radius Error: %f"%RE)
+              (RF1,MF1,RE1) = Extrap(P[0][i-1],P[0][i-2],m[0][i-1],m[0][i-2],r[0][i-1],r[0][i-2],h[0])
+              print("Final Mass for h %f : %2.3e"%(h[0],MF1))
+              print("Final Radius for h %f: %2.4e"%(h[0],RF1))
+              print("Final Interpolation Radius Error for h %f: %f"%(h[0],RE1))
               #Append the final star mass and radius for the given method
-              MSolarFinal[currentmethod].append((MF/(1.989*10**30)))
-              RFinal[currentmethod].append(RF/1000)
-              RIE = pow(RE,2)#this is wrong for now, we need to think of a way to add the erros in a legit fashion
-              #this will be completed after the rk4 double step. 
+              MFE[currentmethod].append((abs(MF1-m[1][-1])/15)/(1.989*10**30))
+              RFE[currentmethod].append((pow(pow(abs(RF1/1000-r[1][-1]/1000)/15,2) + pow(RE1,2),0.5)))
+              MSolarFinal[currentmethod].append((MF1/(1.989*10**30)))
+              RFinal[currentmethod].append(RF1/1000)
+              #this will be completed after the rk4 double step.
               #rk4 double step error = (abs(mstep-mdoublestep))/(2^n-1) where n is 4 for the rk4.
               #rk5 and euler methods will be used to compare results.
-              '''RFError[currentmethod].append(RFE/1000)'''
-              print("Final Mass: %f"%MF)
-              print("Final Radius: %f"%RF)
-              print("Final Radius Error: %f"%RFE)
-              print("interpolation Radius Error: %f"%RE)
-              
+              #RFError[currentmethod].append(RFE/1000)
               #Append the final star mass and radius for the given method
               break
+
+          if(P2<=0 and continueSecondStar):#Boundary condition to know when to stop since edge is reached
+              #interpolate the pressure and mass to where P=0
+              #where RE is radius error due to interploation (newton)
+              (RF2,MF2,RE2) = Extrap(P[1][i-1],P[1][i-2],m[1][i-1],m[1][i-2],r[1][i-1],r[1][i-2],h[1])
+              print("Final Mass for h %f : %2.3e"%(h[1],MF2))
+              print("Final Radius for h %f: %2.4e"%(h[1],RF2))
+              print("Final Interpolation Radius Error for h %f: %f"%(h[1],RE2))
+              m[1].append(MF2)
+              r[1].append(RF2)
+              continueSecondStar=False
           #Append these to be used for the (i+1)th pressure and mass finding
-          P.append(P1)
-          r.append(r1)
-          m.append(m1)
-          
-          Prk5.append(P2)
-          mrk5.append(m2)
-          
+          P[0].append(P1)
+          r[0].append(r1)
+          m[0].append(m1)
+
+          if(continueSecondStar):
+              P[1].append(P2)
+              r[1].append(r2)
+              m[1].append(m2)
+
+          #Prk5.append(P2)
+          #mrk5.append(m2)
+
           #Decide which P2D method to use depending on the current method being investigated
-          if(rho[i-1]>breakpoint and currentmethod==0):
-              rho.append(PressureToDensity2(P1))
-          elif(rho[i-1]<=breakpoint and currentmethod==0):
-              rho.append(PressureToDensity1(P1))
+          if(rho[0][i-1]>breakpoint and currentmethod==0):
+              rho[0].append(PressureToDensity2(P1))
+          elif(rho[0][i-1]<=breakpoint and currentmethod==0):
+              rho[0].append(PressureToDensity1(P1))
           elif(currentmethod==1):
-              rho.append(PressureToDensity3(P1))
-          '''
-          for i in range(1,100000): #Arbitrary number of iterations to ensure enough
-               #Use the previous mass,radius and density to calculate the next one
-              (r2,m2)= rk4(m2[i-1], Mderiv ,r2[i-1],2*h,rho2[i-1],1)
-              #Use the previous mass,radius,density and pressure to calculate the next one
-              (r2,P2) = rk4(P2[i-1], Pderiv ,r2[i-1],2*h,rho2[i-1],m2[i-1])
-              
-              
-              if(P2<=0):#Boundary condition to know when to stop since edge is reached
-                  #interpolate the pressure and mass to where P=0
-                  #where RE is radius error due to interploation (newton)
-                  (RF2,MF2,RE2) = Extrap(P2[i-1],P2[i-2],m2[i-1],m2[i-2],r2[i-1],r2[i-2],h)      
-          P2.append(P2)
-          r2.append(r2)
-          m2.append(m2)
-          #Decide which P2D method to use depending on the current method being investigated
-          if(rho2[i-1]>breakpoint and currentmethod==0):
-              rho2.append(PressureToDensity2(P2))
-          elif(rho2[i-1]<=breakpoint and currentmethod==0):
-              rho2.append(PressureToDensity1(P2))
-          elif(currentmethod==1):
-              rho2.append(PressureToDensity3(P2))
-         '''
-              
-         #'''RadialError = (rk4h - rk42h)/15 , then add in quaradture with interploation error'''
-         #''' Mass error = (rk4h - rk42h)[masses]'''
-         #'''we want to know the mass, radius, intial density and correspning errors'''
-            
+              rho[0].append(PressureToDensity3(P1))
+
+          if(continueSecondStar):
+              if(rho[1][i-1]>breakpoint and currentmethod==0):
+                  rho[1].append(PressureToDensity2(P2))
+              elif(rho[1][i-1]<=breakpoint and currentmethod==0):
+                  rho[1].append(PressureToDensity1(P2))
+              elif(currentmethod==1):
+                  rho[1].append(PressureToDensity3(P2))
 
 #A graph of Mass vs Radius for the whole family,for all methods
 fig = plt.figure()
@@ -268,9 +278,11 @@ for i in range(methods):
     y=MSolarFinal[i]
     y2=RFinal[i]
     x2=(family*10**15)
+    yerror=MFE[i]
+    xerror=RFE[i]
     plt.xlabel("Radius/km")
     plt.ylabel("Solar Masses")
-    plt.plot(x1, y, "o",label=methodNames[i])
+    plt.errorbar(x1, y,yerr=yerror,xerr=xerror,fmt="o",label=methodNames[i])
 plt.legend()
 
 #A graph of Mass vs Central Density for the whole family,for all methods
@@ -279,8 +291,9 @@ for i in range(methods):
     x1=RFinal[i]
     y=MSolarFinal[i]
     y2=RFinal[i]
+    yerror=MFE[i]
     x2=(family*10**15)
-    plt.plot(x2, y, "o",label=methodNames[i])
+    plt.errorbar(x2, y,yerr=yerror,fmt="o",label=methodNames[i])
     plt.xlabel("Central Density/ kgm^-3")
     plt.ylabel("Solar Masses")
 plt.legend()
@@ -290,8 +303,9 @@ for i in range(methods):
     x1=RFinal[i]
     y=MSolarFinal[i]
     y2=RFinal[i]
+    yerror=MFE[i]
     x2=(family*10**15)
-    plt.plot(x2, y2, "o",label=methodNames[i])
+    plt.errorbar(x2, y2,yerr=yerror,fmt="o",label=methodNames[i])
     plt.xlabel("Central Density/ kgm^-3")
     plt.ylabel("Radius/km")
 plt.legend()
