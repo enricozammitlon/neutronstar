@@ -48,20 +48,26 @@ def rk4(y,dy,x,h,rho,m):
 #( the rk5 is theoretcally more accurate but, numerical errors are larger
 #this will be used in disucssion as to how good the rk4 is.
 def rk5(y,dy,x,h,rho,m):
-    k1=dy(y,x,rho,m)
-    k2=h*dy(y+k1/2,x+h/2,rho,m)
-    k3=h*dy(y+(3*k1+k2)/16,x+h/4,rho,m)
-    k4=h*dy(y+k3/2,x+h/2,rho,m)
-    k5=h*dy(y+(-3*k2+6*k3+9*k4)/16, x + 3*h/4,rho,m)
-    k6=h*dy(y+(k1+4*k2+6*k3-12*k4+8*k5)/7, x + h,rho,m)
-    y=y+(7*k1+32*k3+12*k4+32*k5+7*k6)/90
-    x=x+h
-    return (x,y)
+    results=[]
+    for i in range(len(y)):#This loops for all the values of h,2h...etc
+        k1=dy(y[i],x[i],rho[i],m[i])
+        k2=h[i]*dy(y[i]+k1/2,x[i]+h[i]/2,rho[i],m[i])
+        k3=h[i]*dy(y[i]+(3*k1+k2)/16,x[i]+h[i]/4,rho[i],m[i])
+        k4=h[i]*dy(y[i]+k3/2,x[i]+h[i]/2,rho[i],m[i])
+        k5=h[i]*dy(y[i]+(-3*k2+6*k3+9*k4)/16, x[i] + 3*h/4,rho[i],m[i])
+        k6=h[i]*dy(y[i]+(k1+4*k2+6*k3-12*k4+8*k5)/7, x[i] + h[i],rho[i],m[i])
+        yf=y[i]+(7*k1+32*k3+12*k4+32*k5+7*k6)/90
+        xf=x[i]+h[i]
+        results.append([xf,yf])
+    return results
 
 def Euler(y,dy,x,h,rho,m):
-    y = y + h*dy(y,x,rho,m)
-    x = x+h
-    return (x,y)
+    results=[]
+    for i in range(len(y)):#This loops for all the values of h,2h...etc
+        yf = y[i] + h[i]*dy(y[i],x[i],rho[i],m[i])
+        xf = x[i]+h[i]
+        results.append([xf,yf])
+    return results
 
 
 #To be used when?
@@ -198,31 +204,49 @@ for currentmethod in range(methods):#For each method combination
               flags[currentmethod][-1][2]=(r[0][i-1])/1000
               boundThree=True
           #Use the previous mass,radius and density to calculate the next one
-          #(r1,m1)= rk4(m[i-1], Mderiv ,r[i-1],h,rho[i-1],1)
           if(continueSecondStar):
               mResults= rk4([m[0][i-1],m[1][i-1]], Mderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
           else:
               mResults= rk4([m[0][i-1],m[1][-1]], Mderiv ,[r[0][i-1],r[1][-1]],h,[rho[0][i-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
+          """
+          #RK5 for comparison
+          if(continueSecondStar):
+              mResults= rk5([m[0][i-1],m[1][i-1]], Mderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
+          else:
+              mResults= rk5([m[0][i-1],m[1][-1]], Mderiv ,[r[0][i-1],r[1][-1]],h,[rho[0][i-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
+          """
+          """
+          #Euler for comparison
+          if(continueSecondStar):
+              mResults= Euler([m[0][i-1],m[1][i-1]], Mderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
+          else:
+              mResults= Euler([m[0][i-1],m[1][-1]], Mderiv ,[r[0][i-1],r[1][-1]],h,[rho[0][i-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
+          """
           (r1,m1)=mResults[0]
           (r2,m2)=mResults[1]
+
           #Use the previous mass,radius,density and pressure to calculate the next one
-          #(r1,P1) = rk4(P[i-1], Pderiv ,r[i-1],h,rho[i-1],m[i-1])
           if(continueSecondStar):
               pResults = rk4([P[0][i-1],P[1][i-1]], Pderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
           else:
               pResults = rk4([P[0][i-1],P[1][-1]], Pderiv ,[r[0][-1],r[1][-1]],h,[rho[0][-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
+
+          """
+          #RK5 for comparison
+          if(continueSecondStar):
+              pResults = rk5([P[0][i-1],P[1][i-1]], Pderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
+          else:
+              pResults = rk5([P[0][i-1],P[1][-1]], Pderiv ,[r[0][-1],r[1][-1]],h,[rho[0][-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
+          """
+          """
+          #Euler for comparison
+          if(continueSecondStar):
+              pResults = Euler([P[0][i-1],P[1][i-1]], Pderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
+          else:
+              pResults = Euler([P[0][i-1],P[1][-1]], Pderiv ,[r[0][-1],r[1][-1]],h,[rho[0][-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
+          """
           (r1,P1)=pResults[0]
           (r2,P2)=pResults[1]
-          ##### euler and rk5 for comparitive simulations at different 'accuracy''
-          #(r1,m1)= Euler(m[i-1], Mderiv ,r[i-1],h,rho[i-1],1)
-          #(r1,P1) = Euler(P[i-1], Pderiv ,r[i-1],h,rho[i-1],m[i-1])
-          #(r1,m1)= rk5(m[i-1], Mderiv ,r[i-1],h,rho[i-1],1)
-          #(r1,P1) = rk5(P[i-1], Pderiv ,r[i-1],h,rho[i-1],m[i-1])
-
-
-          #rk5 method used for comparison
-          #(a,P2) = rk5(P[i-1], Pderiv ,r[i-1],h,rho[i-1],m[i-1])
-          #(a,m2) = rk5(m[i-1], Mderiv ,r[i-1],h,rho[i-1],1)
 
           if(P1<=0):#Boundary condition to know when to stop since edge is reached
               #interpolate the pressure and mass to where P=0
@@ -239,7 +263,6 @@ for currentmethod in range(methods):#For each method combination
               #this will be completed after the rk4 double step.
               #rk4 double step error = (abs(mstep-mdoublestep))/(2^n-1) where n is 4 for the rk4.
               #rk5 and euler methods will be used to compare results.
-              #RFError[currentmethod].append(RFE/1000)
               #Append the final star mass and radius for the given method
               break
 
@@ -253,6 +276,7 @@ for currentmethod in range(methods):#For each method combination
               m[1].append(MF2)
               r[1].append(RF2)
               continueSecondStar=False
+
           #Append these to be used for the (i+1)th pressure and mass finding
           P[0].append(P1)
           r[0].append(r1)
@@ -262,9 +286,6 @@ for currentmethod in range(methods):#For each method combination
               P[1].append(P2)
               r[1].append(r2)
               m[1].append(m2)
-
-          #Prk5.append(P2)
-          #mrk5.append(m2)
 
           #Decide which P2D method to use depending on the current method being investigated
           if(rho[0][i-1]>breakpoint and currentmethod==0):
@@ -281,7 +302,7 @@ for currentmethod in range(methods):#For each method combination
                   rho[1].append(PressureToDensity1(P2))
               elif(currentmethod==1):
                   rho[1].append(PressureToDensity3(P2))
-"""
+
 #A graph of Mass vs Radius for the whole family,for all methods
 fig = plt.figure()
 for i in range(methods):
@@ -321,8 +342,7 @@ for i in range(methods):
     plt.xlabel("Central Density/ kgm^-3")
     plt.ylabel("Radius/km")
 plt.legend()
-plt.show()
-"""
+
 fig4, ax = plt.subplots()
 
 r1=(flags[0][35][0])
