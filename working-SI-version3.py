@@ -54,7 +54,7 @@ def rk5(y,dy,x,h,rho,m):
         k2=h[i]*dy(y[i]+k1/2,x[i]+h[i]/2,rho[i],m[i])
         k3=h[i]*dy(y[i]+(3*k1+k2)/16,x[i]+h[i]/4,rho[i],m[i])
         k4=h[i]*dy(y[i]+k3/2,x[i]+h[i]/2,rho[i],m[i])
-        k5=h[i]*dy(y[i]+(-3*k2+6*k3+9*k4)/16, x[i] + 3*h/4,rho[i],m[i])
+        k5=h[i]*dy(y[i]+(-3*k2+6*k3+9*k4)/16, x[i] + 3*h[i]/4,rho[i],m[i])
         k6=h[i]*dy(y[i]+(k1+4*k2+6*k3-12*k4+8*k5)/7, x[i] + h[i],rho[i],m[i])
         yf=y[i]+(7*k1+32*k3+12*k4+32*k5+7*k6)/90
         xf=x[i]+h[i]
@@ -204,17 +204,19 @@ for currentmethod in range(methods):#For each method combination
               flags[currentmethod][-1][2]=(r[0][i-1])/1000
               boundThree=True
           #Use the previous mass,radius and density to calculate the next one
+          """
           if(continueSecondStar):
               mResults= rk4([m[0][i-1],m[1][i-1]], Mderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
           else:
               mResults= rk4([m[0][i-1],m[1][-1]], Mderiv ,[r[0][i-1],r[1][-1]],h,[rho[0][i-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
           """
+
           #RK5 for comparison
           if(continueSecondStar):
               mResults= rk5([m[0][i-1],m[1][i-1]], Mderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
           else:
               mResults= rk5([m[0][i-1],m[1][-1]], Mderiv ,[r[0][i-1],r[1][-1]],h,[rho[0][i-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
-          """
+
           """
           #Euler for comparison
           if(continueSecondStar):
@@ -226,18 +228,19 @@ for currentmethod in range(methods):#For each method combination
           (r2,m2)=mResults[1]
 
           #Use the previous mass,radius,density and pressure to calculate the next one
+          """
           if(continueSecondStar):
               pResults = rk4([P[0][i-1],P[1][i-1]], Pderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
           else:
               pResults = rk4([P[0][i-1],P[1][-1]], Pderiv ,[r[0][-1],r[1][-1]],h,[rho[0][-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
-
           """
+
           #RK5 for comparison
           if(continueSecondStar):
               pResults = rk5([P[0][i-1],P[1][i-1]], Pderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
           else:
               pResults = rk5([P[0][i-1],P[1][-1]], Pderiv ,[r[0][-1],r[1][-1]],h,[rho[0][-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
-          """
+
           """
           #Euler for comparison
           if(continueSecondStar):
