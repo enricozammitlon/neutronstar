@@ -111,7 +111,7 @@ def DensityToPressure3(rho):
 
 #This is the classical derivative for pressure.
 #!!!!Rename to Pderiv if you want to use this instead of the TOV!!!!
-omega = 2*np.pi*0
+omega = 2*np.pi*1000
 #omega is used to investigate the addition of (special [not accelerating]) relavtatistic fictious forces
 #set omega to zero to ingore this for the main data set
 def Xderiv(p,r,density,m):
