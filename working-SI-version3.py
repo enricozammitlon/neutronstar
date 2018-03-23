@@ -204,19 +204,19 @@ for currentmethod in range(methods):#For each method combination
               flags[currentmethod][-1][2]=(r[0][i-1])/1000
               boundThree=True
           #Use the previous mass,radius and density to calculate the next one
-          """
+
           if(continueSecondStar):
               mResults= rk4([m[0][i-1],m[1][i-1]], Mderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
           else:
               mResults= rk4([m[0][i-1],m[1][-1]], Mderiv ,[r[0][i-1],r[1][-1]],h,[rho[0][i-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
-          """
 
+          """
           #RK5 for comparison
           if(continueSecondStar):
               mResults= rk5([m[0][i-1],m[1][i-1]], Mderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
           else:
               mResults= rk5([m[0][i-1],m[1][-1]], Mderiv ,[r[0][i-1],r[1][-1]],h,[rho[0][i-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
-
+          """
           """
           #Euler for comparison
           if(continueSecondStar):
@@ -228,19 +228,19 @@ for currentmethod in range(methods):#For each method combination
           (r2,m2)=mResults[1]
 
           #Use the previous mass,radius,density and pressure to calculate the next one
-          """
+
           if(continueSecondStar):
               pResults = rk4([P[0][i-1],P[1][i-1]], Pderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
           else:
               pResults = rk4([P[0][i-1],P[1][-1]], Pderiv ,[r[0][-1],r[1][-1]],h,[rho[0][-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
-          """
 
+          """
           #RK5 for comparison
           if(continueSecondStar):
               pResults = rk5([P[0][i-1],P[1][i-1]], Pderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
           else:
               pResults = rk5([P[0][i-1],P[1][-1]], Pderiv ,[r[0][-1],r[1][-1]],h,[rho[0][-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
-
+          """
           """
           #Euler for comparison
           if(continueSecondStar):
@@ -358,7 +358,7 @@ ax.annotate('Neutron Liquid',xy=(r2/2, r2/2),rotation=-45)
 ax.annotate('Inner Crust',xy=(2/3 *r3, r3/2),rotation=-45)
 ax.annotate("Outer Crust",
             xy=(r4*math.cos(math.radians(45)),r4*math.sin(math.radians(45))), xycoords='data',
-            xytext=(10, 10), textcoords='data',
+            xytext=(r4-3, r4-1), textcoords='data',
             arrowprops=dict(arrowstyle="->",
                             connectionstyle="arc3"),
             )
@@ -383,7 +383,7 @@ ax2.annotate('Core',xy=(r1/2, r1/2),rotation=-45)
 ax2.annotate('Neutron Liquid',xy=(r2/2, r2/2),rotation=-45)
 ax2.annotate("Outer Crust",
             xy=(r4*math.cos(math.radians(45)),r4*math.sin(math.radians(45))), xycoords='data',
-            xytext=(7, 8), textcoords='data',
+            xytext=(r4-3, r4-1), textcoords='data',
             arrowprops=dict(arrowstyle="->",
                             connectionstyle="arc3"),
             )
