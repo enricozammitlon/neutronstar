@@ -111,7 +111,7 @@ def DensityToPressure3(rho):
 
 #This is the classical derivative for pressure.
 #!!!!Rename to Pderiv if you want to use this instead of the TOV!!!!
-omega = 2*np.pi*1000
+omega = 2*np.pi*0
 #omega is used to investigate the addition of (special [not accelerating]) relavtatistic fictious forces
 #set omega to zero to ingore this for the main data set
 def Xderiv(p,r,density,m):
@@ -233,7 +233,7 @@ for currentmethod in range(methods):#For each method combination
               pResults = rk4([P[0][i-1],P[1][i-1]], Pderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
           else:
               pResults = rk4([P[0][i-1],P[1][-1]], Pderiv ,[r[0][-1],r[1][-1]],h,[rho[0][-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
-
+          
           """
           #RK5 for comparison
           if(continueSecondStar):
@@ -318,8 +318,8 @@ for i in range(methods):
     plt.xlabel("Radius/km")
     plt.ylabel("Solar Masses")
     plt.errorbar(x1, y,yerr=yerror,xerr=xerror,fmt="o",label=methodNames[i])
-    print("Using method %s the maximum radius is %2.2f km with mass %2.2f M0"%(methodNames[i],max(x1),y[x1.index(max(x1))]))
-    print("Using method %s the maximum mass is %2.2f M0 with radius %2.2f km"%(methodNames[i],max(y),x1[y.index(max(y))]))
+    print("Using method %s the maximum radius is %2.4f km with mass %2.4f M0"%(methodNames[i],max(x1),y[x1.index(max(x1))]))
+    print("Using method %s the maximum mass is %2.4f M0 with radius %2.4f km"%(methodNames[i],max(y),x1[y.index(max(y))]))
 plt.legend()
 
 #A graph of Mass vs Central Density for the whole family,for all methods
