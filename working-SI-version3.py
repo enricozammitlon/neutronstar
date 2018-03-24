@@ -305,7 +305,7 @@ for currentmethod in range(methods):#For each method combination
                   rho[1].append(PressureToDensity1(P2))
               elif(currentmethod==1):
                   rho[1].append(PressureToDensity3(P2))
-
+print("\n")
 #A graph of Mass vs Radius for the whole family,for all methods
 fig = plt.figure()
 for i in range(methods):
@@ -318,6 +318,8 @@ for i in range(methods):
     plt.xlabel("Radius/km")
     plt.ylabel("Solar Masses")
     plt.errorbar(x1, y,yerr=yerror,xerr=xerror,fmt="o",label=methodNames[i])
+    print("Using method %s the maximum radius is %2.2f km with mass %2.2f M0"%(methodNames[i],max(x1),y[x1.index(max(x1))]))
+    print("Using method %s the maximum mass is %2.2f M0 with radius %2.2f km"%(methodNames[i],max(y),x1[y.index(max(y))]))
 plt.legend()
 
 #A graph of Mass vs Central Density for the whole family,for all methods
@@ -331,6 +333,7 @@ for i in range(methods):
     plt.errorbar(x2, y,yerr=yerror,fmt="o",label=methodNames[i])
     plt.xlabel("Central Density/ kgm^-3")
     plt.ylabel("Solar Masses")
+
 plt.legend()
 #A graph of Radius vs Central Density for the whole family,for all methods
 
