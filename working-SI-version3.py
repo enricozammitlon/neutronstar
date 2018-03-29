@@ -233,7 +233,7 @@ for currentmethod in range(methods):#For each method combination
               pResults = rk4([P[0][i-1],P[1][i-1]], Pderiv ,[r[0][i-1],r[1][i-1]],h,[rho[0][i-1],rho[1][i-1]],[m[0][i-1],m[1][i-1]])
           else:
               pResults = rk4([P[0][i-1],P[1][-1]], Pderiv ,[r[0][-1],r[1][-1]],h,[rho[0][-1],rho[1][-1]],[m[0][i-1],m[1][-1]])
-          
+
           """
           #RK5 for comparison
           if(continueSecondStar):
@@ -320,6 +320,9 @@ for i in range(methods):
     plt.errorbar(x1, y,yerr=yerror,xerr=xerror,fmt="o",label=methodNames[i])
     print("Using method %s the maximum radius is %2.4f km with mass %2.4f M0"%(methodNames[i],max(x1),y[x1.index(max(x1))]))
     print("Using method %s the maximum mass is %2.4f M0 with radius %2.4f km"%(methodNames[i],max(y),x1[y.index(max(y))]))
+    print("Using method %s the mass error is %2.6f M0 with radius error %2.6f km"%(methodNames[i],MFE[i][35],RFE[i][35]))
+
+
 plt.legend()
 
 #A graph of Mass vs Central Density for the whole family,for all methods
@@ -399,4 +402,87 @@ ax2.plot()
 ax2.set_title("Method: %s with Central Density: %2.3e"%(methodNames[1],family[35]*1e17))
 plt.xlabel("Radius/km")
 plt.ylabel("Radius/km")
+
+
+steps=[1,10,50,100,1000]
+mfinal=[[],[],[],[],[]]
+rfinal=[[],[],[],[],[]]
+def rk4Secondary(y,dy,x,h,rho,m):
+    k1=dy(y,x,rho,m)
+    k2=dy(y+h/2*k1,x+h/2,rho,m)
+    k3=dy(y+h/2*k2,x+h/2,rho,m)
+    k4=dy(y+h*k3,x+h,rho,m)
+    y=y+h*(k1+2*k2+2*k3+k4)/6
+    x=x+h
+    return (x,y)
+
+def ExtrapSecondary(p1,p2,m1,m2,r1,r2):
+  grad1 = (p1-p2)/(r1-r2) #Take gradient of pressure
+  c = P1 - grad1*r1 #This is the linear form y=mx+c
+  #Use newton-raphson numerical analysis to get the radius at P=0
+  RadExtrap =optimize.newton(lambda R: +grad1*R +c, r1)
+  grad2 = (m1-m2)/(r1-r2) #Mass gradient
+  d = m1 - grad2*r1 #Calculate offset of mass using y=mx+c again
+  MassExtrap = grad2*RadExtrap + d #Extrapolate to where P=0 ( R(P=0))
+  return RadExtrap,MassExtrap
+
+for currentmethod in range(methods):
+    count=0
+    for i in steps:
+        mfinal[count].append([])
+        rfinal[count].append([])
+        h = i #Step size in meters
+        r =[h] #Will hold the radius as it grows
+        m =[0] #Will hold the mass as it grows
+        rho = [(family[35]*10**17)] #Will hold the density as it decreases
+        P = [] #Will hold the pressure as it decreases
+        breakpoint=1e17 #For method 0 a breakpoint between high and low densities is needed
+
+        #Initialise the pressure using the appropriate D2P(current_central_density)
+        if currentmethod==0 :
+            P.append(DensityToPressure2(rho[0]))
+        if currentmethod==1:
+            P.append(DensityToPressure3(rho[0]))
+
+        for i in range(1,100000): #Arbitrary number of iterations to ensure enough
+            #print("Mass:    \t%2.6e"%(m[i-1]))
+            #print("Pressure:\t%2.6e"%(P[i-1]))
+            #print("New Density:\t%e"%(rho[i-1]))
+            #print("New R :\t%f"%(r[i-1]))
+            mfinal[count][currentmethod].append((m[i-1]/(1.989*10**30)))
+            rfinal[count][currentmethod].append(r[i-1]/1000)
+            #Use the previous mass,radius and density to calculate the next one
+            (r1,m1)= rk4Secondary(m[i-1], Mderiv ,r[i-1],h,rho[i-1],1)
+            #Use the previous mass,radius,density and pressure to calculate the next one
+            (r1,P1) = rk4Secondary(P[i-1], Pderiv ,r[i-1],h,rho[i-1],m[i-1])
+
+            if(P1<=0):#Boundary condition to know when to stop since edge is reached
+                #Extrapolate the pressure and mass to where P=0
+                (RF,MF) = ExtrapSecondary(P[i-1],P[i-2],m[i-1],m[i-2],r[i-1],r[i-2])
+                #Append the final star mass and radius for the given method
+                mfinal[count][currentmethod].append((MF/(1.989*10**30)))
+                rfinal[count][currentmethod].append(RF/1000)
+                break
+            #Append these to be used for the (i+1)th pressure and mass finding
+            P.append(P1)
+            r.append(r1)
+            m.append(m1)
+            #Decide which P2D method to use depending on the current method being investigated
+            if(rho[i-1]>breakpoint and currentmethod==0):
+                rho.append(PressureToDensity2(P1))
+            elif(rho[i-1]<=breakpoint and currentmethod==0):
+                rho.append(PressureToDensity1(P1))
+            elif(currentmethod==1):
+                rho.append(PressureToDensity3(P1))
+        count+=1
+
+fig6 = plt.figure("Build up vs h steps")
+for i in range(len(steps)):
+#    for j in range(methods):
+        x1=rfinal[i][1]
+        y=mfinal[i][1]
+        plt.plot(x1, y,"o",label="%s with stepsize %d"%(methodNames[1],steps[i]))
+        plt.xlabel("radius/km")
+        plt.ylabel("mass/M0")
+plt.legend()
 plt.show()
