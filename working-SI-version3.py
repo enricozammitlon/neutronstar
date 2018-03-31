@@ -114,7 +114,7 @@ def DensityToPressure3(rho):
 omega = 2*np.pi*0
 #omega is used to investigate the addition of (special [not accelerating]) relavtatistic fictious forces
 #set omega to zero to ingore this for the main data set
-def Xderiv(p,r,density,m):
+def Pderiv(p,r,density,m):
   if(r==0):
     return 0
   else:
@@ -127,7 +127,7 @@ def Xderiv(p,r,density,m):
 #This is the relativistic form of the derivative aka TOV
 
 
-def Pderiv(P,r,rho,m):
+def Xderiv(P,r,rho,m):
   if m == 0:
     return 0
   else:
@@ -321,6 +321,7 @@ for i in range(methods):
     print("Using method %s the maximum radius is %2.4f km with mass %2.4f M0"%(methodNames[i],max(x1),y[x1.index(max(x1))]))
     print("Using method %s the maximum mass is %2.4f M0 with radius %2.4f km"%(methodNames[i],max(y),x1[y.index(max(y))]))
     print("Using method %s the mass error is %2.6f M0 with radius error %2.6f km"%(methodNames[i],MFE[i][35],RFE[i][35]))
+    print("Using method %s the minimmum mass is %2.4f M0 with radius %2.4f km"%(methodNames[i],min(y),x1[y.index(min(y))]))
 
 
 plt.legend()
@@ -404,7 +405,7 @@ plt.xlabel("Radius/km")
 plt.ylabel("Radius/km")
 
 
-steps=[1,10,50,100,1000]
+steps=[1,100,500,1000,2000]
 mfinal=[[],[],[],[],[]]
 rfinal=[[],[],[],[],[]]
 def rk4Secondary(y,dy,x,h,rho,m):
@@ -434,7 +435,7 @@ for currentmethod in range(methods):
         h = i #Step size in meters
         r =[h] #Will hold the radius as it grows
         m =[0] #Will hold the mass as it grows
-        rho = [(family[35]*10**17)] #Will hold the density as it decreases
+        rho = [(family[3]*10**17)] #Will hold the density as it decreases
         P = [] #Will hold the pressure as it decreases
         breakpoint=1e17 #For method 0 a breakpoint between high and low densities is needed
 
@@ -444,7 +445,7 @@ for currentmethod in range(methods):
         if currentmethod==1:
             P.append(DensityToPressure3(rho[0]))
 
-        for i in range(1,100000): #Arbitrary number of iterations to ensure enough
+        for i in range(1,1000000): #Arbitrary number of iterations to ensure enough
             #print("Mass:    \t%2.6e"%(m[i-1]))
             #print("Pressure:\t%2.6e"%(P[i-1]))
             #print("New Density:\t%e"%(rho[i-1]))
@@ -481,7 +482,7 @@ for i in range(len(steps)):
 #    for j in range(methods):
         x1=rfinal[i][1]
         y=mfinal[i][1]
-        plt.plot(x1, y,"o",label="%s with stepsize %d"%(methodNames[1],steps[i]))
+        plt.plot(x1, y,"--",label="%s with stepsize %d"%(methodNames[1],steps[i]))
         plt.xlabel("radius/km")
         plt.ylabel("mass/M0")
 plt.legend()
